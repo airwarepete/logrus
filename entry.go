@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Defines the key when adding errors using WithError.
+// Defines the Key when adding errors using WithError.
 var ErrorKey = "error"
 
 // An entry is the final or intermediate Logrus logging entry. It contains all
@@ -34,8 +34,6 @@ type Entry struct {
 func NewEntry(logger *Logger) *Entry {
 	return &Entry{
 		Logger: logger,
-		// Default is three fields, give a little extra room
-		Data: make(Fields, 5),
 	}
 }
 
@@ -56,29 +54,29 @@ func (entry *Entry) String() (string, error) {
 	return reader.String(), err
 }
 
-// Add an error as single field (using the key defined in ErrorKey) to the Entry.
+// Add an error as single field (using the Key defined in ErrorKey) to the Entry.
 func (entry *Entry) WithError(err error) *Entry {
 	return entry.WithField(ErrorKey, err)
 }
 
 // Add a single field to the Entry.
 func (entry *Entry) WithField(key string, value interface{}) *Entry {
-	return entry.WithFields(Fields{key: value})
+	return entry.WithFields(Fields{{Key: key, Value: value}})
 }
 
-// Add a map of fields to the Entry.
+// Add a list of fields to the Entry.
 func (entry *Entry) WithFields(fields Fields) *Entry {
-	data := Fields{}
-	for k, v := range entry.Data {
-		data[k] = v
+	allFields := []Field{}
+	for _, field := range entry.Data {
+		allFields = append(allFields, Field{field.Key, field.Value})
 	}
-	for k, v := range fields {
-		data[k] = v
+	for _, field := range fields {
+		allFields = append(allFields, Field{field.Key, field.Value})
 	}
-	return &Entry{Logger: entry.Logger, Data: data}
+	return &Entry{Logger: entry.Logger, Data: fields}
 }
 
-// This function is not declared with a pointer value because otherwise
+// This function is not declared with a pointer Value because otherwise
 // race conditions will occur when using multiple goroutines
 func (entry Entry) log(level Level, msg string) {
 	entry.Time = time.Now()
@@ -106,7 +104,7 @@ func (entry Entry) log(level Level, msg string) {
 		fmt.Fprintf(os.Stderr, "Failed to write to log, %v\n", err)
 	}
 
-	// To avoid Entry#log() returning a value that only would make sense for
+	// To avoid Entry#log() returning a Value that only would make sense for
 	// panic() to use in Entry#Panic(), we avoid the allocation by checking
 	// directly here.
 	if level <= PanicLevel {

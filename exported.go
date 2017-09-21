@@ -48,7 +48,7 @@ func AddHook(hook Hook) {
 	std.Hooks.Add(hook)
 }
 
-// WithError creates an entry from the standard logger and adds an error to it, using the value defined in ErrorKey as key.
+// WithError creates an entry from the standard logger and adds an error to it, using the Value defined in ErrorKey as Key.
 func WithError(err error) *Entry {
 	return std.WithField(ErrorKey, err)
 }

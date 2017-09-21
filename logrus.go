@@ -5,8 +5,13 @@ import (
 	"log"
 )
 
+type Field struct {
+	Key   string
+	Value interface{}
+}
+
 // Fields type, used to pass to `WithFields`.
-type Fields map[string]interface{}
+type Fields []Field
 
 // Level type
 type Level uint8

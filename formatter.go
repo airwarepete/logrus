@@ -30,19 +30,28 @@ type Formatter interface {
 //
 // It's not exported because it's still using Data in an opinionated way. It's to
 // avoid code duplication between the two default formatters.
-func prefixFieldClashes(data Fields) {
-	_, ok := data["time"]
-	if ok {
-		data["fields.time"] = data["time"]
+
+func isFieldContained(fields Fields, fieldName string) (bool, Field) {
+	for _, field := range fields {
+		if field.Key == fieldName {
+			return true, field
+		}
+	}
+	return false, Field{}
+}
+func prefixFieldClashes(fields Fields) {
+	isContained, field := isFieldContained(fields, "time")
+	if isContained {
+		field.Key = "fields.time"
 	}
 
-	_, ok = data["msg"]
-	if ok {
-		data["fields.msg"] = data["msg"]
+	isContained, field = isFieldContained(fields, "msg")
+	if isContained {
+		field.Key = "fields.msg"
 	}
 
-	_, ok = data["level"]
-	if ok {
-		data["fields.level"] = data["level"]
+	isContained, field = isFieldContained(fields, "level")
+	if isContained {
+		field.Key = "fields.level"
 	}
 }
