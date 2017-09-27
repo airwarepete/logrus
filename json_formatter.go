@@ -15,18 +15,19 @@ func (f *JSONFormatter) Format(entry *Entry) ([]byte, error) {
 	if timestampFormat == "" {
 		timestampFormat = DefaultTimestampFormat
 	}
-	fields := []Field{}
-	fields = append(fields, Field{Key: "time", Value: entry.Time.Format(timestampFormat)})
-	fields = append(fields, Field{Key: "msg", Value: entry.Message})
-	fields = append(fields, Field{Key: "level", Value: entry.Level.String()})
+	// this translates the field key/values back to a map to make the json output more readable even tho the order may still be jacked.
+	fields := make(map[string]string)
+	fields["time"] = entry.Time.Format(timestampFormat)
+	fields["level"] = entry.Level.String()
+	fields["msg"] = entry.Message
 	for _, field := range entry.Data {
 		switch v := field.Value.(type) {
 		case error:
 			// Otherwise errors are ignored by `encoding/json`
 			// https://github.com/Sirupsen/logrus/issues/137
-			fields = append(fields, Field{Key: field.Key, Value: v.Error()})
+			fields[field.Key] = v.Error()
 		default:
-			fields = append(fields, field)
+			fields[field.Key] = field.Value.(string)
 		}
 	}
 
