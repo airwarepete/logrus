@@ -16,7 +16,7 @@ func (f *JSONFormatter) Format(entry *Entry) ([]byte, error) {
 		timestampFormat = DefaultTimestampFormat
 	}
 	// this translates the field key/values back to a map to make the json output more readable even tho the order may still be jacked.
-	fields := make(map[string]string)
+	fields := make(map[string]interface{})
 	fields["time"] = entry.Time.Format(timestampFormat)
 	fields["level"] = entry.Level.String()
 	fields["msg"] = entry.Message
@@ -27,7 +27,7 @@ func (f *JSONFormatter) Format(entry *Entry) ([]byte, error) {
 			// https://github.com/Sirupsen/logrus/issues/137
 			fields[field.Key] = v.Error()
 		default:
-			fields[field.Key] = field.Value.(string)
+			fields[field.Key] = field.Value
 		}
 	}
 
