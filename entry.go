@@ -73,7 +73,7 @@ func (entry *Entry) WithFields(fields Fields) *Entry {
 	for _, field := range fields {
 		allFields = append(allFields, Field{field.Key, field.Value})
 	}
-	return &Entry{Logger: entry.Logger, Data: fields}
+	return &Entry{Logger: entry.Logger, Data: allFields}
 }
 
 // This function is not declared with a pointer Value because otherwise
